@@ -1,0 +1,63 @@
+# code: language=Ansible insertSpaces=true tabSize=2
+
+- name: Tests - Lookups
+  hosts: nios
+  connection: local
+  tasks:
+
+    - block:
+
+      - name: Return the list of network views
+        debug:
+          msg: "{{ lookup('nios', 'networkview', provider=nios_provider) }}"
+
+      - name: Returns the list of views
+        debug:
+          msg: "{{ lookup('nios', 'view', provider=nios_provider) }}"
+
+      - name: Returns a single host record
+        debug:
+          msg: "{{ lookup('nios', 'record:host', filter={'name': 'k8s-ict-master-01.dt.ept.lu'}, provider=nios_provider) }}"
+
+      - name: Returns next IP
+        debug:
+          msg: "{{ lookup('nios_next_ip', '172.29.42.0/24', provider=nios_provider) }}"
+      
+      tags: [never, lookup, lookups]
+
+
+- name: Tests - Setup (create resources)
+  hosts: nios
+  connection: local
+  tasks:
+
+    - block:
+
+      - name: Create a host record
+        community.general.nios_host_record:
+          name: created-by-ansible.dt.ept.lu
+          view: "DT-internal"
+          ipv4addrs:
+            - ipv4addr: "{{ lookup('nios_next_ip', '172.29.42.0/24', provider=nios_provider)[0] }}"
+          comment: "Host record created by Ansible test playbook for Infoblox (IPAM automation project)"
+          state: present
+          provider: "{{ nios_provider }}"
+      
+      tags: [never, setup]
+
+
+- name: Tests - Teardown & remove (delete resources)
+  hosts: nios
+  connection: local
+  tasks:
+
+    - block:
+
+      - name: Delete a host record
+        nios_host_record:
+          name: created-by-ansible.dt.ept.lu
+          view: "DT-internal"
+          state: absent
+          provider: "{{ nios_provider }}"
+      
+      tags: [never, teardown, remove]

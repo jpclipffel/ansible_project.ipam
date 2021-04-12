@@ -1,0 +1,5 @@
+# code: language=Ansible insertSpaces=true tabSize=2
+
+# - src: git+https://git.dt.ept.lu/ict-infra/iac/ansible/roles/<role_name>
+#   version: master
+#   scm: git
