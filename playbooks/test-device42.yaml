@@ -1,0 +1,31 @@
+# code: language=Ansible insertSpaces=true tabSize=2
+
+- name: Tests - Get
+  hosts: device42
+  tasks:
+
+    - block:
+
+      - name: Get all devices
+        device42_api:
+          meth: GET
+          path: /api/2.0/devices/
+          data:
+            limit: 10
+        register: _devices
+
+      - debug:
+          var: _devices
+
+      - name: Get devices by name
+        device42_api:
+          meth: GET
+          path: /api/2.0/devices/
+          data:
+            name: G121-LAN-5820
+        register: _named_devices
+
+      - debug:
+          var: _named_devices
+
+      tags: [never, get]
