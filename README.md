@@ -2,7 +2,14 @@
 
 Ansible project for IPAM automation.
 
-## Installation & requirements
+This project include several custom Ansible modules and plugins, namely:
+
+| Component                     | Kind           | Description                              |
+|-------------------------------|----------------|------------------------------------------|
+| `library/device42_api.py`     | Module         | Low-level interface to Device42 REST API |
+| `plugins/httpapi/device42.py` | HTTPAPI plugin | Connection plugin for Device42 REST API  |
+
+## Requirements
 
 * This project requires the Python package `infoblox-client` [\[1\]][1]
     * On AWX or Ansible tower, add a new custom virtual environement as follow:
@@ -30,10 +37,6 @@ their connector from host's Python path instead of the Ansible Python path:
 
 ### Inventory
 
-This project requires at least one inventory which targets `localhost` which
-will contains the Infoblox configuration (as Infoblox is reached from the
-Ansible controller).
-
 Inventory example:
 
 ```YAML
@@ -46,28 +49,34 @@ all:
           nios_provider:
             # Required parameters
             host: ib-gridmaster.dt.ept.lu
-            username: "{{ nios_user }}"
-            password: "{{ nios_password }}"
+            username: "{{ nios_user | default(lookup('env', 'INFOBLOX_USERNAME')) }}"
+            password: "{{ nios_password | default(lookup('env', 'INFOBLOX_PASSWORD')) }}"
             # Optional parameters
             http_request_timeout: 60
+    # Device42 API servers
+    device42:
+      vars:
+          ansible_network_os: device42
+          ansible_connection: httpapi
+          ansible_httpapi_port: 443
+          ansible_httpapi_use_ssl: yes
+          ansible_httpapi_validate_certs: no
+          ansible_user: "{{ d42_user }}"
+          ansible_password: "{{ d42_password }}"
+      hosts:
+        "d42.dt.ept.lu":
 ```
 
-Compatible playbook example:
+## Tests
 
-```YAML
-- name: Tests - Lookups
-  hosts: nios
-  connection: local
-  tasks:
+One can test the project by running the following playbooks:
 
-  - name: Return the list of network views
-    debug:
-      msg: "{{ lookup('nios', 'networkview', provider=nios_provider) }}"
-```
+| Playbook                       | Description               |
+|--------------------------------|---------------------------|
+| `playbooks/test-infoblox.yaml` | Test Infoblox integration |
+| `playbooks/test-device42.yaml` | Test Device42 integration |
 
-## Test
-
-One can test the project by running the `playbooks/test.yaml` playbook.
+### Test Infoblox integartion
 
 The following variables **must** be provided, e.g. with `-e {...}`:
 
@@ -84,14 +93,20 @@ The following tags **may** be used, e.g. with `--tags '...'`:
 | `setup`              | Assert the creation of resources                      |
 | `teardown`, `remove` | Assert the deletion of resources created with `setup` |
 
-Example to test everything at once:
+### Test Device42
 
-```Bash
-ansible-playbook projects/ipam/playbooks/test.yaml \
--i inventories/ipam-ict \
--e '{"nios_user": "foo", "nios_password": "***"}' \
---tags 'lookup,setup,teardown'
-```
+The following variables **must** be provided, e.g. with `-e {...}`:
+
+| Variable name   | Description       |
+|-----------------|-------------------|
+| `d42_user`      | Device42 username |
+| `d42_password`  | Device42 password |
+
+The following tags **may** be used, e.g. with `--tags '...'`:
+
+| Tags                 | Description         |
+|----------------------|---------------------|
+| `get`                | Test `GET` requests |
 
 ---
 
