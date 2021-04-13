@@ -1,0 +1,82 @@
+# code: language=Ansible insertSpaces=true tabSize=2
+
+- name: Create IP
+  hosts: nios
+  connection: local
+  tasks:
+
+    - name: Assert arguments
+      assert:
+        that: "{{ item.test }}"
+        fail_msg: "Rejected requested {{ item.kind }}: '{{ item.data }}'"
+        success_msg: "Accepted requested {{ item.kind }}: '{{ item.data }}'"
+      with_items:
+        - kind: "network view"
+          data: "{{ request_view | default('') }}"
+          test:
+            - "item.data | length > 0"
+        - kind: "network range"
+          data: "{{ request_network | default('') }}"
+          test:
+            - "item.data | length > 0"
+        - kind: "IP count"
+          data: "{{ request_count | default(-1) | int }}"
+          test:
+            - "item.data | int > 0 and item.data | int <= 245"
+      tags: [always]
+    
+    - name: Get view and network
+      set_fact:
+        infoblox_view:    "{{ lookup('nios', 'view',    provider=nios_provider, filter={'name': request_view}) }}"
+        infoblox_network: "{{ lookup('nios', 'network', provider=nios_provider, filter={'network': request_network}) }}"
+      tags: [always]
+
+    - name: Assert view and network
+      assert:
+        that:
+          - "item.data is mapping and item.data | length > 0"
+        fail_msg: "The requested {{ item.kind }} '{{ item.name }}' was not found in Infoblox"
+        success_msg: "The requested {{ item.kind }} '{{ item.name }}' is valid"
+      with_items:
+        - kind: 'network view'
+          name: "{{ request_view }}"
+          data: "{{ infoblox_view }}"
+        - kind: 'network'
+          name: "{{ request_network }}"
+          data: "{{ infoblox_network }}"
+      tags: [always]
+
+    - name: Create hosts records
+      debug:
+        msg: "Would create record {{ __chr_nios_next_ip }} on view {{ request_view }} in network {{ request_network }}"
+      loop: "{{ lookup('nios_next_ip', request_network, num=request_count, provider=nios_provider) }}"
+      loop_control:
+        loop_var: __chr_nios_next_ip
+      register: request_records
+      tags: [never, setup]
+
+    - name: Create hosts records
+      community.general.nios_host_record:
+        name: created-by-ansible.dt.ept.lu
+        view: "{{ request_view }}"
+        ipv4addrs:
+          - ipv4addr: "{{ __chr_nios_next_ip }}"
+        comment: "Created by the IPAM automation project"
+        state: present
+        provider: "{{ nios_provider }}"
+      loop: "{{ lookup('nios_next_ip', request_network, num=request_count, provider=nios_provider) }}"
+      loop_control:
+        loop_var: __chr_nios_next_ip
+      register: request_records
+      tags: [never]
+      
+
+- name: Register IP
+  hosts: device42
+  tasks:
+
+    - name: Register IP
+      debug:
+        var: hostvars[item]['request_records']
+      with_items: "{{ groups['nios'] }}"
+      tags: [never, setup]
