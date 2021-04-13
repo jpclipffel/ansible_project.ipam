@@ -9,7 +9,7 @@
       - name: Get all devices
         device42_api:
           meth: GET
-          path: /api/2.0/devices/
+          path: api/2.0/devices
           data:
             limit: 10
         register: _devices
@@ -20,12 +20,22 @@
       - name: Get devices by name
         device42_api:
           meth: GET
-          path: /api/2.0/devices/
+          path: api/2.0/devices
           data:
             name: G121-LAN-5820
+            foobar: 42
         register: _named_devices
 
       - debug:
           var: _named_devices
+
+      - name: Get device by ID
+        device42_api:
+          meth: GET
+          path: api/1.0/devices/5127
+        register: _device_id
+
+      - debug:
+          var: _device_id
 
       tags: [never, get]
