@@ -1,11 +1,14 @@
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.connection import Connection
+
+
 ANSIBLE_METADATA = {
     'metadata_version': '0.1',
     'status': ['preview'],
     'supported_by': 'community'
 }
 
-
-DOCUMENTATION = r'''
+DOCUMENTATION = '''
 ---
 module: device42_api
 
@@ -37,31 +40,27 @@ author:
     - Jean-Philippe Clipffel (@jpclipffel)
 '''
 
-EXAMPLES = r'''
+EXAMPLES = '''
 - name: Query resource
   device42_api:
     meth: GET
     path: devices
 '''
 
-RETURN = r'''
+RETURN = '''
 msg:
-    description: Device42's response's 'msg' field
+    description: The 'msg' field from Device42 response
     type: str
     returned: always
 code:
-    description: Device42's response's 'code' field
+    description: The 'code' fields from Device42 response
     type: int
     returned: always
 data:
-    description: Device42's response
+    description: The full Device42 response
     type: complex
     returned: always
 '''
-
-
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.connection import Connection
 
 
 def run_module():
@@ -71,21 +70,34 @@ def run_module():
     module_args = {
         'meth': {'type': str,  'required': True},
         'path': {'type': str,  'required': True},
-        'data': {'type': dict, 'required': False, 'default': {}}
+        'data': {'type': dict, 'required': False, 'default': {}},
     }
     # Initializes module, connection and API helper
-    module = AnsibleModule(argument_spec=module_args, supports_check_mode=False)
+    module = AnsibleModule(
+            argument_spec=module_args,
+            supports_check_mode=False)
     connection = Connection(module._socket_path)
-    # Run module
-    module.exit_json(**{
-        'msg': 'Done',
-        'code': 0,
-        'data': connection.send_request(
+    # ---
+    try:
+        # Run module
+        status_code, data = connection.send_request(
             data=module.params['data'],
             path=module.params['path'],
             method=module.params['meth']
         )
-    })
+        # Setup callback and terminate
+        cback = status_code in [200,] and module.exit_json or module.fail_json
+        cback(**{
+            'msg': data.get('msg', None),
+            'code': data.get('code', -1),
+            'data': data
+        })
+    except Exception as error:
+        module.fail_json(**{
+            'msg': str(error),
+            'code': -1,
+            'data': {}
+        })
 
 
 def main():

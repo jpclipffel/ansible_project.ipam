@@ -1,8 +1,9 @@
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+import json
+
+from ansible.errors import AnsibleConnectionFailure
+from ansible.plugins.httpapi import HttpApiBase
 
 
-# Mpdule documentation
 DOCUMENTATION = '''
 ---
 author:
@@ -14,19 +15,9 @@ description:
 version_added: "3.0"
 '''
 
-import json
-import base64
-
-from ansible.errors import AnsibleConnectionFailure
-from ansible.plugins.httpapi import HttpApiBase
-from ansible.module_utils.basic import to_text
-from ansible.module_utils.connection import ConnectionError
-# pylint: disable = no-name-in-module, import-error
-from ansible.module_utils.six.moves.urllib.error import HTTPError
-
 
 class HttpApi(HttpApiBase):
-    """Ansible's HTTPAPI interface for Device42 API.
+    """Ansible's HTTPAPI plugin for Device42 API.
 
     :ivar headers:  Default request headers
     """
@@ -48,8 +39,11 @@ class HttpApi(HttpApiBase):
         :return:    Tuple as `(status_code: int, content: dict)`
         """
         try:
+            # Normalize path
+            path = f'/{path.strip("/")}/'
+            method = method.upper()
             # Forge query parameters
-            if method.lower() == 'get':
+            if method in ['GET',]:
                 params = '&'.join([f'{k}={v}' for k, v in data.items()])
                 path = f'{path}?{params}'
             # Forge and send request
@@ -67,9 +61,6 @@ class HttpApi(HttpApiBase):
         # Raised when Device42 response cannot be decoded to a `dict`
         except json.JSONDecodeError as error:
             raise Exception(f'Failed to decode Device42 response: {str(error)}: {response_data.getvalue()}')
-        # Raised when a generic HTTP error occurs
-        except HTTPError as error:
-            raise Exception(f'HTTP error: {str(error)}')
         # Raised when Ansible failed to connect to Device42
         except AnsibleConnectionFailure as error:
             raise Exception(f'Connection error: {str(error)}')
