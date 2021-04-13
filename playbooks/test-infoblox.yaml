@@ -11,18 +11,22 @@
         debug:
           msg: "{{ lookup('nios', 'networkview', provider=nios_provider) }}"
 
-      - name: Returns the list of views
+      - name: Return the list of views
         debug:
           msg: "{{ lookup('nios', 'view', provider=nios_provider) }}"
 
-      - name: Returns a single host record
+      - name: Return a single host record
         debug:
           msg: "{{ lookup('nios', 'record:host', filter={'name': 'k8s-ict-master-01.dt.ept.lu'}, provider=nios_provider) }}"
 
-      - name: Returns next IP
+      - name: Return next IP
         debug:
           msg: "{{ lookup('nios_next_ip', '172.29.42.0/24', provider=nios_provider) }}"
-      
+
+      - name: Return the list of networks
+        debug:
+          msg: "{{ lookup('nios', 'network', filter={'network_view': 'DT-internal', 'network': '172.29.42.0/24'}, provider=nios_provider) }}"
+
       tags: [never, lookup, lookups]
 
 
