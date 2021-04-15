@@ -15,6 +15,10 @@
           data: "{{ request_view | default('') }}"
           test:
             - "item.data | length > 0"
+        - name: "network container"
+          data: "{{ request_container | default('') }}"
+          test:
+            - "item.data | length > 0"
         - name: "network range"
           data: "{{ request_network | default('') }}"
           test:
@@ -30,13 +34,14 @@
 
       tags: [always]
     
-    - name: Get view and network
+    - name: Lookup view, container and network
       set_fact:
-        infoblox_view:    "{{ lookup('nios', 'view',    provider=nios_provider, filter={'name': request_view}) }}"
+        infoblox_view: "{{ lookup('nios', 'view', provider=nios_provider, filter={'name': request_view}) }}"
+        infoblox_container: "{{ lookup('nios', 'networkcontainer', extattrs={'Plateforme': request_container}, provider=nios_provider) }}"
         infoblox_network: "{{ lookup('nios', 'network', provider=nios_provider, filter={'network': request_network}) }}"
       tags: [always]
 
-    - name: Assert view and network
+    - name: Assert view, container and network
       assert:
         that:
           - "item.data is mapping and item.data | length > 0"
@@ -46,9 +51,20 @@
         - kind: 'network view'
           name: "{{ request_view }}"
           data: "{{ infoblox_view }}"
+        - kind: 'network container'
+          name: "{{ request_container }}"
+          data: "{{ infoblox_container }}"
         - kind: 'network'
           name: "{{ request_network }}"
           data: "{{ infoblox_network }}"
+      tags: [always]
+
+    - name: Assert network inclusion in container
+      assert:
+        that:
+          - "{{ infoblox_container.network | network_in_network(infoblox_network.network) }}"
+        fail_msg: "The requested network {{ infoblox_network.network }} is not contained in network container {{ infoblox_container.network }}"
+        success_msg: "The requested network {{ infoblox_network.network }} is contained in network container {{ infoblox_container.network }}"
       tags: [always]
 
     - name: Create hosts records
