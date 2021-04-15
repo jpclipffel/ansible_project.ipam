@@ -27,6 +27,10 @@
         debug:
           msg: "{{ lookup('nios', 'network', filter={'network_view': 'DT-internal', 'network': '172.29.42.0/24'}, provider=nios_provider) }}"
 
+      - name: Return the list of networks containers
+        debug:
+          msg: "{{ lookup('nios', 'networkcontainer', extattrs={'Plateforme': '49435400000001'}, provider=nios_provider) }}"
+
       tags: [never, lookup, lookups]
 
 
