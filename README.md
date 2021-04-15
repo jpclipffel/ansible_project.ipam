@@ -2,12 +2,14 @@
 
 Ansible project for IPAM automation.
 
-This project include several custom Ansible modules and plugins, namely:
+This project includes several Ansible playbooks, custom module and plugin:
 
-| Component                     | Kind           | Description                              |
-|-------------------------------|----------------|------------------------------------------|
-| `library/device42_api.py`     | Module         | Low-level interface to Device42 REST API |
-| `plugins/httpapi/device42.py` | HTTPAPI plugin | Connection plugin for Device42 REST API  |
+| Component                     | Kind           | Description                                      |
+|-------------------------------|----------------|--------------------------------------------------|
+| `playbooks/create-ip.yaml`    | Playbook       | Register one or more IP on Infoblox and Device42 |
+| `playbooks/notify-mail.yaml`  | Playbook       | Notify the caller user by mail                   |
+| `library/device42_api.py`     | Module         | Low-level interface to Device42 REST API         |
+| `plugins/httpapi/device42.py` | HTTPAPI plugin | Connection plugin for Device42 REST API          |
 
 ## Requirements
 
