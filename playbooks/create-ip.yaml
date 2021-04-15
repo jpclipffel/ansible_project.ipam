@@ -8,21 +8,26 @@
     - name: Assert arguments
       assert:
         that: "{{ item.test }}"
-        fail_msg: "Rejected requested {{ item.kind }}: '{{ item.data }}'"
-        success_msg: "Accepted requested {{ item.kind }}: '{{ item.data }}'"
+        fail_msg: "Rejected requested {{ item.name }}: '{{ item.data }}'"
+        success_msg: "Accepted requested {{ item.name }}: '{{ item.data }}'"
       with_items:
-        - kind: "network view"
+        - name: "network view"
           data: "{{ request_view | default('') }}"
           test:
             - "item.data | length > 0"
-        - kind: "network range"
+        - name: "network range"
           data: "{{ request_network | default('') }}"
           test:
             - "item.data | length > 0"
-        - kind: "IP count"
+        - name: "IP count"
           data: "{{ request_count | default(-1) | int }}"
           test:
             - "item.data | int > 0 and item.data | int <= 245"
+        # - name: "Name template"
+        #   data: !unsafe 
+        #   test:
+        #     - "item.data | length > 0"
+
       tags: [always]
     
     - name: Get view and network
@@ -48,25 +53,27 @@
 
     - name: Create hosts records
       debug:
-        msg: "Would create record {{ __chr_nios_next_ip }} on view {{ request_view }} in network {{ request_network }}"
+        msg: "Would create record {{ request_name }} at {{ ipv4 }} on view {{ request_view }} in network {{ request_network }}"
       loop: "{{ lookup('nios_next_ip', request_network, num=request_count, provider=nios_provider) }}"
       loop_control:
-        loop_var: __chr_nios_next_ip
+        loop_var: ipv4
+        index_var: count
       register: request_records
       tags: [never, setup]
 
     - name: Create hosts records
       community.general.nios_host_record:
-        name: created-by-ansible.dt.ept.lu
+        name: "{{ request_name }}"
         view: "{{ request_view }}"
         ipv4addrs:
-          - ipv4addr: "{{ __chr_nios_next_ip }}"
+          - ipv4addr: "{{ ipv4 }}"
         comment: "Created by the IPAM automation project"
         state: present
         provider: "{{ nios_provider }}"
       loop: "{{ lookup('nios_next_ip', request_network, num=request_count, provider=nios_provider) }}"
       loop_control:
-        loop_var: __chr_nios_next_ip
+        loop_var: ipv4
+        index_var: count
       register: request_records
       tags: [never]
       
@@ -83,7 +90,8 @@
 
 
 - name: Notify
-  hosts: localhost
+  hosts: all
+  gather_facts: no
   tasks:
 
     - name: Notify caller by mail
@@ -98,4 +106,6 @@
           value: "{{ tower_user_name | default('') }}"
         - key: tower_user_lastname
           value: "{{ tower_user_lastname | default('') }}"
+      delegate_to: localhost
+      run_once: yes
       tags: [never, setup]
