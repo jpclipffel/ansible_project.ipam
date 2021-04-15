@@ -1,0 +1,28 @@
+# code: language=Ansible insertSpaces=true tabSize=2
+
+- name: Notify by mail
+  hosts: all
+  gather_facts: no
+  tasks:
+
+    - debug:
+        msg: "{{ item.key }}: {{ item.value }}"
+      with_items:
+        - key: tower_user_email
+          value: "{{ tower_user_email | default('') }}"
+        - key: tower_user_id
+          value: "{{ tower_user_id | default('') }}"
+        - key: tower_user_name
+          value: "{{ tower_user_name | default('') }}"
+        - key: tower_user_lastname
+          value: "{{ tower_user_lastname | default('') }}"
+      delegate_to: localhost
+      run_once: yes
+      tags: [always]
+    
+    - name: Notify caller by mail
+      debug:
+        var: request_records
+      delegate_to: localhost
+      run_once: yes
+      tags: [always]

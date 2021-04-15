@@ -76,7 +76,12 @@
         index_var: count
       register: request_records
       tags: [never]
-      
+
+    - set_stats:
+        data:
+          request_records: "{{ request_records }}"
+      tags: [always]
+
 
 - name: Register IP
   hosts: device42
@@ -89,23 +94,23 @@
       tags: [never, setup]
 
 
-- name: Notify
-  hosts: all
-  gather_facts: no
-  tasks:
+# - name: Notify
+#   hosts: all
+#   gather_facts: no
+#   tasks:
 
-    - name: Notify caller by mail
-      debug:
-        msg: "{{ item.key }}: {{ item.value }}"
-      with_items:
-        - key: tower_user_email
-          value: "{{ tower_user_email | default('') }}"
-        - key: tower_user_id
-          value: "{{ tower_user_id | default('') }}"
-        - key: tower_user_name
-          value: "{{ tower_user_name | default('') }}"
-        - key: tower_user_lastname
-          value: "{{ tower_user_lastname | default('') }}"
-      delegate_to: localhost
-      run_once: yes
-      tags: [never, setup]
+#     - name: Notify caller by mail
+#       debug:
+#         msg: "{{ item.key }}: {{ item.value }}"
+#       with_items:
+#         - key: tower_user_email
+#           value: "{{ tower_user_email | default('') }}"
+#         - key: tower_user_id
+#           value: "{{ tower_user_id | default('') }}"
+#         - key: tower_user_name
+#           value: "{{ tower_user_name | default('') }}"
+#         - key: tower_user_lastname
+#           value: "{{ tower_user_lastname | default('') }}"
+#       delegate_to: localhost
+#       run_once: yes
+#       tags: [never, setup]
