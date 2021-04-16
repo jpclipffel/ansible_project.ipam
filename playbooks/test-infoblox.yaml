@@ -42,15 +42,29 @@
     - block:
 
       - name: Create a host record
-        community.general.nios_host_record:
+        nios_host_record:
           name: created-by-ansible.dt.ept.lu
-          view: "DT-internal"
+          view: DT-internal
           ipv4addrs:
             - ipv4addr: "{{ lookup('nios_next_ip', '172.29.42.0/24', provider=nios_provider)[0] }}"
-          comment: "Host record created by Ansible test playbook for Infoblox (IPAM automation project)"
+          comment: "Host record created by Ansible test playbook"
           state: present
           provider: "{{ nios_provider }}"
-      
+        register: _create_host_record
+        failed_when:
+          - _create_host_record.failed and not "already exists" in _create_host_record.msg
+  
+      - name: Create a network
+        nios_network:
+          network: 172.27.253.128/25
+          network_view: DT-internal
+          extattrs:
+            Plateforme: "49435400000003"
+          comment: "Network created by Ansible test playbook"
+          state: present
+          provider: "{{ nios_provider }}"
+        register: _create_network
+
       tags: [never, setup]
 
 
@@ -65,6 +79,13 @@
         nios_host_record:
           name: created-by-ansible.dt.ept.lu
           view: "DT-internal"
+          state: absent
+          provider: "{{ nios_provider }}"
+      
+      - name: Delete a network
+        nios_network:
+          network: 172.27.253.128/25
+          network_view: DT-internal
           state: absent
           provider: "{{ nios_provider }}"
       
