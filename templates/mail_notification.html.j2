@@ -350,7 +350,8 @@
                     <tr>
                       <td>
                         <p>Hi,</p>
-                        <p>You requested the creation of a {{ notify_kind | default('IPAM network resource') }}; Please find hereafter the outcome of your request.</p>
+                        <p>You requested the creation of a {{ notify_kind | default('IPAM network resource') }}.</p>
+                        <p>{{ notify_message | default('Please find your request outcome hereafter') }}.<p>
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
 
