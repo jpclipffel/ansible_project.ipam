@@ -74,7 +74,9 @@
     - name: Report
       set_stats:
         data:
-          notify_kind: "Network"
+          notify_kind: "{{ 'query' in ansible_run_tags and 'query' or 'setup' }}"
+          notify_resource: "network"
+          # ---
           request_view: "{{ request_view }}"
           request_container: "{{ request_container }}"
           request_network: "{{ request_network }}"
