@@ -1,7 +1,7 @@
 # code: language=Ansible insertSpaces=true tabSize=2
 
 - name: Notify by mail
-  hosts: all
+  hosts: localhost
   gather_facts: no
   tasks:
 
