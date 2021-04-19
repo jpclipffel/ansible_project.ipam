@@ -1,7 +1,6 @@
 # code: language=Ansible insertSpaces=true tabSize=2
 
-- name: Create network
-  hosts: nios
+- hosts: nios
   connection: local
   tasks:
 
@@ -9,16 +8,16 @@
       assert:
         that:
           - item.data | length > 0
-        fail_msg: "Rejected requested {{ item.name }}: '{{ item.data }}'"
-        success_msg: "Accepted requested {{ item.name }}: '{{ item.data }}'"
+        fail_msg: "Rejected requested {{ item.kind }}: '{{ item.data }}'"
+        success_msg: "Accepted requested {{ item.kind }}: '{{ item.data }}'"
       with_items:
-        - name: "network view"
+        - kind: "network view"
           data: "{{ request_view | default('') }}"
-        - name: "network container"
+        - kind: "network container"
           data: "{{ request_container | default('') }}"
-        - name: "network range"
+        - kind: "network"
           data: "{{ request_network | default('') }}"
-        - name: "plateforme id"
+        - kind: "plateforme"
           data: "{{ request_plateforme | default('') }}"
       tags: [always]
     
@@ -32,7 +31,7 @@
     - name: Assert view and container
       assert:
         that:
-          - "item.data is mapping and item.data | length > 0"
+          - item.data is mapping and item.data | length > 0
         fail_msg: "The requested {{ item.kind }} '{{ item.name }}' was not found in Infoblox"
         success_msg: "The requested {{ item.kind }} '{{ item.name }}' is valid"
       with_items:
@@ -49,7 +48,7 @@
         that:
           - infoblox_network | length == 0
         success_msg: "The request network does not exists, continue"
-        fail_msg: "The request network {{ request_network }} already exists: {{ infoblox_network }}"
+        fail_msg: "The request network {{ request_network }} already exists"
       tags: [always]
 
     - name: Assert network inclusion in container
@@ -59,12 +58,6 @@
         fail_msg: "The requested network {{ request_network }} is not contained in network container {{ infoblox_container.network }}"
         success_msg: "The requested network {{ request_network }} is contained in network container {{ infoblox_container.network }}"
       tags: [always]
-
-    # - name: Create network
-    #   debug:
-    #     msg: "Would create network {{ request_network }} with plateforme id {{ request_plateforme }} in container {{ request_container }}"
-    #   register: created_network
-    #   tags: [never, setup]
 
     - name: Create network
       nios_network:
@@ -78,18 +71,23 @@
       register: created_network
       tags: [never, setup]
 
-    - set_stats:
+    - name: Report
+      set_stats:
         data:
-          created_network: "{{ created_network }}"
-      tags: [always]
+          notify_kind: "Network"
+          request_view: "{{ request_view }}"
+          request_container: "{{ request_container }}"
+          request_network: "{{ request_network }}"
+          request_plateforme: "{{ request_plateforme }}"
+      tags: [never, query, setup]
 
 
-- name: Register network
-  hosts: device42
-  tasks:
+# - name: Register network
+#   hosts: device42
+#   tasks:
 
-    - name: Register network
-      debug:
-        var: hostvars[item]['created_network']
-      with_items: "{{ groups['nios'] }}"
-      tags: [never, setup]
+#     - name: Register network
+#       debug:
+#         var: hostvars[item]['created_network']
+#       with_items: "{{ groups['nios'] }}"
+#       tags: [never, setup]
