@@ -60,11 +60,11 @@
         success_msg: "The requested network {{ request_network }} is contained in network container {{ infoblox_container.network }}"
       tags: [always]
 
-    - name: Create network
-      debug:
-        msg: "Would create network {{ request_network }} with plateforme id {{ request_plateforme }} in container {{ request_container }}"
-      register: created_network
-      tags: [never, setup]
+    # - name: Create network
+    #   debug:
+    #     msg: "Would create network {{ request_network }} with plateforme id {{ request_plateforme }} in container {{ request_container }}"
+    #   register: created_network
+    #   tags: [never, setup]
 
     - name: Create network
       nios_network:
@@ -76,7 +76,7 @@
         state: present
         provider: "{{ nios_provider }}"
       register: created_network
-      tags: [never]
+      tags: [never, setup]
 
     - set_stats:
         data:
