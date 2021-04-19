@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Simple Transactional Email</title>
+    <title>IPAM resource {{ notify_kind | default('') }}</title>
     <style>
       /* -------------------------------------
           GLOBAL RESETS
@@ -333,7 +333,7 @@
     </style>
   </head>
   <body class="">
-    <span class="preheader">IPAM resource creation request</span>
+    <span class="preheader">IPAM resource {{ notify_kind }}</span>
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
       <tr>
         <td>&nbsp;</td>
@@ -350,29 +350,22 @@
                     <tr>
                       <td>
                         <p>Hi,</p>
-                        <p>You requested the creation of a {{ notify_kind | default('IPAM network resource') }}.</p>
+                        <p>You requested the {{ notify_kind | default('unknown operation') }} of a {{ notify_resource | default('IPAM network resource') }}.</p>
                         <p>{{ notify_message | default('Please find your request outcome hereafter') }}.<p>
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
 
                             <tr>
                               <td>
-                                <h3>Hosts records</h3>
+                                <h3>Dump</h3>
                                 <code>
-                                  {{ created_records | default('{ ... }') }}
+                                  {{ request_view | default('') }}
+                                  {{ request_container | default('') }}
+                                  {{ request_network | default('') }}
+                                  {{ request_plateforme | default('') }}
                                 </code>
                               </td>
                             </tr>
-
-                            <tr>
-                              <td>
-                                <h3>Network</h3>
-                                <code>
-                                  {{ created_network | default('{ ... }') }}
-                                </code>
-                              </td>
-                            </tr>
-
 
                           </tbody>
                         </table>
