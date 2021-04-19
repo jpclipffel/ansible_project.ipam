@@ -5,11 +5,11 @@
   gather_facts: no
   tasks:
 
-    - name: Notify caller by mail
+    - name: Notify - Query
       mail:
         host: smtp.dt.ept.lu
         port: 25
-        subject: "[IPAM] - {{ notify_kind | default('Unknown kind') }} - {{ notify_status | default('Unknown status') }}"
+        subject: "[IPAM] - {{ notify_resource | default('Unknown kind') }} query - {{ notify_status | default('Unknown status') }}"
         body: "{{ lookup('template', '../templates/mail_notification.html.j2') }}"
         from: ansible@post.lu
         to: ["{{ tower_user_email }}"]
@@ -19,4 +19,20 @@
         - "tower_user_email | default('') | length > 0"
       delegate_to: localhost
       run_once: yes
-      tags: [always]
+      tags: [never, query]
+
+    - name: Notify - Setup
+      mail:
+        host: smtp.dt.ept.lu
+        port: 25
+        subject: "[IPAM] - {{ notify_resource | default('Unknown kind') }} setup - {{ notify_status | default('Unknown status') }}"
+        body: "{{ lookup('template', '../templates/mail_notification.html.j2') }}"
+        from: ansible@post.lu
+        to: ["{{ tower_user_email }}"]
+        charset: "utf-8" 
+        subtype: "html"
+      when:
+        - "tower_user_email | default('') | length > 0"
+      delegate_to: localhost
+      run_once: yes
+      tags: [never, setup]
