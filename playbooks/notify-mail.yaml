@@ -10,8 +10,8 @@
         # Resource should be set at the workflow level
         notify_resource: "{{ notify_resource | default('Unknown resource') }}"
         # Kind, status and message should be set at the job level
-        notify_kind: "{{ notify_kind | default('Unknown kind') }}"
-        notify_status: "{{ notify_status | default('Unknwon tatus') }}"
+        notify_action: "{{ notify_action | default('Unknown action') }}"
+        notify_status: "{{ notify_status | default('Unknwon status') }}"
         notify_message: "{{ notify_message | default('Unknown message') }}"
         # The job ID is deducted automatically
         notify_job_approval_id: "{{ awx_job_id | default(0) | int + 2 }}"
@@ -22,7 +22,7 @@
       mail:
         host: smtp.dt.ept.lu
         port: 25
-        subject: "[IPAM] - {{ notify_resource }} {{ notify_kind }} - {{ notify_status }}"
+        subject: "[IPAM] - {{ notify_resource }} {{ notify_action }} - {{ notify_status }}"
         body: "{{ lookup('template', '../templates/mail_notification.html.j2') }}"
         from: ansible@post.lu
         to: ["{{ tower_user_email }}"]
