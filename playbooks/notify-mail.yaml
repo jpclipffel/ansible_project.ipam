@@ -7,10 +7,10 @@
 
     - name: Setup arguments
       set_fact:
-        # Kind and resource should be set at the workflow level
-        notify_kind: "{{ notify_kind | default('Unknown kind') }}"
+        # Resource should be set at the workflow level
         notify_resource: "{{ notify_resource | default('Unknown resource') }}"
-        # Status and message should be set at the job level
+        # Kind, status and message should be set at the job level
+        notify_kind: "{{ notify_kind | default('Unknown kind') }}"
         notify_status: "{{ notify_status | default('Unknwon tatus') }}"
         notify_message: "{{ notify_message | default('Unknown message') }}"
         # The job ID is deducted automatically
