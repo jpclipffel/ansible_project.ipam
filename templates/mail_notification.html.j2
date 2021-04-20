@@ -362,9 +362,7 @@
                                 {{ awx_job_id }}
                                 {{ awx_workflow_job_id }}
                                 {{ awx_workflow_job_name }}
-                                {{ awx_schedule_id }}
-                                {{ awx_schedule_name }}
-                                
+
                                 {% if notify_kind | default('') == 'network' %}
                                   {{ request_view | default('') }}
                                   {{ request_container | default('') }}
