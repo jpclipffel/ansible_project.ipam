@@ -358,7 +358,7 @@
                             <tr>
                               <td>
                                 <code>
-                                  {% if notify_kind | lower in ['network',] %}
+                                  {% if notify_resource | lower in ['network',] %}
                                   {{ request_view | default('') }}
 
                                   {{ request_container | default('') }}
@@ -375,6 +375,8 @@
                                 </code>
                               </td>
                             </tr>
+
+                            <tr></tr>
 
                             {% if notify_kind | lower in ['creation', 'setup'] %}
                             <tr>
