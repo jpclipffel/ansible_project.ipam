@@ -14,7 +14,7 @@
         notify_status: "{{ notify_status | default('Unknwon tatus') }}"
         notify_message: "{{ notify_message | default('Unknown message') }}"
         # The job ID is deducted automatically
-        notify_job_approval_id: {{ awx_job_id | default(0) | int + 2 }}
+        notify_job_approval_id: "{{ awx_job_id | default(0) | int + 2 }}"
       tags: [always]
 
 
