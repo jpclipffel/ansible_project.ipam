@@ -18,7 +18,7 @@
       tags: [always]
 
 
-    - name: Notify - Query
+    - name: Notify
       mail:
         host: smtp.dt.ept.lu
         port: 25
