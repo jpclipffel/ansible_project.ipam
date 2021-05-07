@@ -39,3 +39,24 @@
           var: _device_id
 
       tags: [never, get]
+
+
+- name: Tests - Post
+  hosts: device42
+  tasks:
+
+    - block:
+
+      - name: Create subnet
+        device42_api:
+          meth: POST
+          path: api/1.0/subnets
+          data:
+            network: "172.27.253.128"
+            mask_bits: "25"
+        register: _subnet
+      
+      - debug:
+          var: _subnet
+      
+      tags: [never, post]

@@ -84,12 +84,12 @@
       tags: [never, query, setup]
 
 
-# - name: Register network
-#   hosts: device42
-#   tasks:
+- name: Register network
+  hosts: device42
+  tasks:
 
-#     - name: Register network
-#       debug:
-#         var: hostvars[item]['created_network']
-#       with_items: "{{ groups['nios'] }}"
-#       tags: [never, setup]
+    - name: Register network
+      debug:
+        var: hostvars[item]['created_network']
+      with_items: "{{ groups['nios'] }}"
+      tags: [never, setup]
