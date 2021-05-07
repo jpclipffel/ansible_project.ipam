@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>IPAM resource {{ notify_action }}</title>
+    <title>IPAM resource {{ notify_action }} - {{ notify_status | upper }}</title>
     <style>
       /* -------------------------------------
           GLOBAL RESETS
@@ -333,7 +333,7 @@
     </style>
   </head>
   <body class="">
-    <span class="preheader">IPAM resource {{ notify_action }}</span>
+    <span class="preheader">IPAM resource {{ notify_action }} - {{ notify_status | upper }}</span>
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
       <tr>
         <td>&nbsp;</td>
@@ -383,7 +383,7 @@
                               <td>
                             </tr>
 
-                            {% if notify_action | lower in ['creation', 'setup'] %}
+                            {% if notify_status | lower in ['validation', ] %}
                             <tr>
                               <td align="left">
                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
