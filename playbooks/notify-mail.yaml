@@ -22,7 +22,7 @@
       mail:
         host: smtp.dt.ept.lu
         port: 25
-        subject: "[IPAM] - {{ notify_resource }} {{ notify_action }} - {{ notify_status }}"
+        subject: "[IPAM] - {{ notify_resource }} {{ notify_action }} - {{ notify_status | upper }}"
         body: "{{ lookup('template', '../templates/mail_notification.html.j2') }}"
         from: ansible@post.lu
         to: ["{{ tower_user_email }}"]
