@@ -74,9 +74,9 @@
     - name: Set D42 facts
       set_fact:
         created_network:
-        network: "{{ request_network }}"
-        network_view: "{{ request_view }}"
-        plateforme: "{{ request_plateforme }}"
+          network: "{{ request_network }}"
+          network_view: "{{ request_view }}"
+          plateforme: "{{ request_plateforme }}"
       tags: [never, setup]
 
     - name: Report
@@ -101,3 +101,13 @@
         var: hostvars[item]['created_network']
       with_items: "{{ groups['nios'] }}"
       tags: [never, setup]
+
+    # - name: Register network
+    #   device42_api:
+    #     meth: POST
+    #     path: api/1.0/subnets
+    #     data:
+    #       network: "{{ hostvars[item]['created_network']['request_network'] }}"
+    #       mask_bits: "25"
+    #   with_items: "{{ groups['nios'] }}"
+    #   tags: [never, setup]
