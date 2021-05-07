@@ -74,8 +74,8 @@
     - name: Set D42 facts
       set_fact:
         created_network:
-          network: "{{ request_network.split('/)[0] }}"
-          mask_bits: "{{ request_network.split('/)[1] }}"
+          network: "{{ request_network.split('/')[0] }}"
+          mask_bits: "{{ request_network.split('/')[1] }}"
           network_view: "{{ request_view }}"
           plateforme: "{{ request_plateforme }}"
       tags: [never, setup]
