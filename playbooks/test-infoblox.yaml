@@ -11,27 +11,27 @@
 
       - name: Return the list of network views
         debug:
-          msg: "{{ lookup('nios', 'networkview', provider=nios_provider) }}"
+          msg: "{{ lookup('infoblox.nios_modules.nios', 'networkview', provider=nios_provider) }}"
 
       - name: Return the list of views
         debug:
-          msg: "{{ lookup('nios', 'view', provider=nios_provider) }}"
+          msg: "{{ lookup('infoblox.nios_modules.nios', 'view', provider=nios_provider) }}"
 
       - name: Return a single host record
         debug:
-          msg: "{{ lookup('nios', 'record:host', filter={'name': 'k8s-ict-master-01.dt.ept.lu'}, provider=nios_provider) }}"
+          msg: "{{ lookup('infoblox.nios_modules.nios', 'record:host', filter={'name': 'k8s-ict-master-01.dt.ept.lu'}, provider=nios_provider) }}"
 
       - name: Return next IP
         debug:
-          msg: "{{ lookup('nios_next_ip', '172.29.42.0/24', provider=nios_provider) }}"
+          msg: "{{ lookup('infoblox.nios_modules.nios_next_ip', '172.29.42.0/24', provider=nios_provider) }}"
 
       - name: Return the list of networks
         debug:
-          msg: "{{ lookup('nios', 'network', filter={'network_view': 'DT-internal', 'network': '172.29.42.0/24'}, provider=nios_provider) }}"
+          msg: "{{ lookup('infoblox.nios_modules.nios', 'network', filter={'network_view': 'DT-internal', 'network': '172.29.42.0/24'}, provider=nios_provider) }}"
 
       - name: Return the list of networks containers
         debug:
-          msg: "{{ lookup('nios', 'networkcontainer', extattrs={'Plateforme': '49435400000001'}, provider=nios_provider) }}"
+          msg: "{{ lookup('infoblox.nios_modules.nios', 'networkcontainer', extattrs={'Plateforme': '49435400000001'}, provider=nios_provider) }}"
 
       tags: [never, lookup, lookups]
 
@@ -50,7 +50,7 @@
           name: created-by-ansible.dt.ept.lu
           view: DT-internal
           ipv4addrs:
-            - ipv4addr: "{{ lookup('nios_next_ip', '172.29.42.0/24', provider=nios_provider)[0] }}"
+            - ipv4addr: "{{ lookup('infoblox.nios_modules.nios_next_ip', '172.29.42.0/24', provider=nios_provider)[0] }}"
           comment: "Host record created by Ansible test playbook"
           state: present
           provider: "{{ nios_provider }}"
