@@ -11,15 +11,15 @@
 
       - name: Return the list of network views
         debug:
-          msg: "{{ lookup('infoblox.nios_modules.nios', 'networkview', provider=nios_provider) }}"
+          msg: "{{ lookup('community.general.nios', 'networkview', provider=nios_provider) }}"
 
       - name: Return the list of views
         debug:
-          msg: "{{ lookup('infoblox.nios_modules.nios', 'view', provider=nios_provider) }}"
+          msg: "{{ lookup('community.general.nios', 'view', provider=nios_provider) }}"
 
       - name: Return a single host record
         debug:
-          msg: "{{ lookup('infoblox.nios_modules.nios', 'record:host', filter={'name': 'k8s-ict-master-01.dt.ept.lu'}, provider=nios_provider) }}"
+          msg: "{{ lookup('community.general.nios', 'record:host', filter={'name': 'k8s-ict-master-01.dt.ept.lu'}, provider=nios_provider) }}"
 
       - name: Return next IP
         debug:
