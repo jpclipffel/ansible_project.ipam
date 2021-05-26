@@ -38,6 +38,8 @@
 
 - name: Tests - Setup (create resources)
   hosts: nios
+  collections:
+    - infoblox.nios_modules
   connection: local
   tasks:
 
@@ -72,6 +74,8 @@
 
 - name: Tests - Teardown & remove (delete resources)
   hosts: nios
+  collections:
+    - infoblox.nios_modules
   connection: local
   tasks:
 
