@@ -98,13 +98,40 @@
           created_records: "{{ created_records }}"
       tags: [always]
 
+    - name: Set D42 facts
+      set_fact:
+        created_ips: "{{ created_records }}"
+      tags: [never, setup]
+
+    - name: Report
+      set_stats:
+        data:
+          notify_kind: "{{ 'query' in ansible_run_tags and 'query' or 'setup' }}"
+          notify_resource: "ip"
+          # ---
+          created_ips: "{{ created_records }}"
+          # ---
+          request_view: "{{ request_view }}"
+          request_container: "{{ request_container }}"
+          request_range: "{{ request_range }}"
+      tags: [never, query, setup]
+
 
 - name: Register host records
   hosts: device42
   tasks:
 
+    # - name: Register host records
+    #   debug:
+    #     var: hostvars[item]['created_records']
+    #   with_items: "{{ groups['nios'] }}"
+    #   tags: [never, setup]
+
     - name: Register host records
-      debug:
-        var: hostvars[item]['created_records']
+      device42_api:
+        meth: POST
+        path: api/1.0/hosts
+        data:
+          address: "{{ hostvars[item]['created_ips']['address'] }}"
       with_items: "{{ groups['nios'] }}"
       tags: [never, setup]
