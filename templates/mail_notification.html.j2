@@ -360,16 +360,12 @@
                                 <code>
                                   {% if notify_resource | lower in ['network',] %}
                                   {{ request_view | default('') }}
-
                                   {{ request_container | default('') }}
-
                                   {{ request_network | default('') }}
-
                                   {{ request_plateforme | default('') }}
 
-                                  {% else %}
-
-                                  { ... }
+                                  {% elif notify_resource | lower in ['ip',] %}
+                                  {{ request_records | default('') }}
 
                                   {% endif %}
                                 </code>
