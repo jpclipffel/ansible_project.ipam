@@ -19,18 +19,22 @@
           data: "{{ request_container | default('') }}"
           test:
             - "item.data | length > 0"
-        - name: "network range"
+        - name: "network"
           data: "{{ request_network | default('') }}"
+          test:
+            - "item.data | length > 0"
+        - name: "DNS zone"
+          data: "{{ request_zone | default('') }}"
           test:
             - "item.data | length > 0"
         - name: "IP count"
           data: "{{ request_count | default(-1) | int }}"
           test:
             - "item.data | int > 0 and item.data | int <= 245"
-        # - name: "Name template"
-        #   data: !unsafe 
-        #   test:
-        #     - "item.data | length > 0"
+        - name: "name template"
+          data: !unsafe "{{ request_name }}" 
+          test:
+            - "item.data | length > 0"
 
       tags: [always]
     
@@ -67,54 +71,50 @@
         success_msg: "The requested network {{ infoblox_network.network }} is contained in network container {{ infoblox_container.network }}"
       tags: [always]
 
-    - name: Create hosts records
-      debug:
-        msg: "Would create record {{ request_name }} at {{ ipv4 }} on view {{ request_view }} in network {{ request_network }}"
+    - name: Prepare records
+      set_fact:
+        request_records: "{{ request_records | default([]) + [{
+            'ipv4': record,
+            'name': request_name,
+            'zone': request_zone,
+            'view': request_view,
+            'network': request_network
+          }] }}"
       loop: "{{ lookup('nios_next_ip', request_network, num=request_count, provider=nios_provider) }}"
       loop_control:
-        loop_var: ipv4
+        loop_var: record
         index_var: count
-      register: created_records
-      tags: [never, setup]
-
-    - name: Create hosts records
-      community.general.nios_host_record:
-        name: "{{ request_name }}"
-        view: "{{ request_view }}"
-        ipv4addrs:
-          - ipv4addr: "{{ ipv4 }}"
-        comment: "Created by the IPAM automation project"
-        state: present
-        provider: "{{ nios_provider }}"
-      loop: "{{ lookup('nios_next_ip', request_network, num=request_count, provider=nios_provider) }}"
-      loop_control:
-        loop_var: ipv4
-        index_var: count
-      register: created_records
-      tags: [never]
-
-    - set_stats:
-        data:
-          created_records: "{{ created_records }}"
       tags: [always]
 
-    - name: Set D42 facts
-      set_fact:
-        created_ips: "{{ created_records }}"
-      tags: [never, setup]
-
-    - name: Report
+    - name: Set stats
       set_stats:
         data:
-          notify_kind: "{{ 'query' in ansible_run_tags and 'query' or 'setup' }}"
-          notify_resource: "ip"
-          # ---
-          created_ips: "{{ created_records }}"
-          # ---
-          request_view: "{{ request_view }}"
-          request_container: "{{ request_container }}"
-          request_range: "{{ request_range }}"
-      tags: [never, query, setup]
+          request_records: "{{ request_records }}"
+      tags: [always]
+
+    - name: Create records
+      debug:
+        msg: "Would create record {{ record.name }}.{{ record.zone }} at {{ record.ipv4 }} on view {{ record.view }} in network {{ record.network }}"
+      loop: "{{ request_records }}"
+      loop_control:
+        loop_var: record
+        index_var: count
+      tags: [never, setup]
+
+    # - name: Create records
+    #   community.general.nios_host_record:
+    #     name: "{{ record.name }}.{{ record.zone }}"
+    #     view: "{{ record.view }}"
+    #     ipv4addrs:
+    #       - ipv4addr: "{{ record.ipv4 }}"
+    #     comment: "Created by the IPAM automation project"
+    #     state: present
+    #     provider: "{{ nios_provider }}"
+    #   loop: "{{ request_records }}"
+    #   loop_control:
+    #     loop_var: record
+    #     index_var: count
+    #   tags: [never, setup]
 
 
 - name: Register host records
@@ -123,15 +123,22 @@
 
     # - name: Register host records
     #   debug:
-    #     var: hostvars[item]['created_records']
-    #   with_items: "{{ groups['nios'] }}"
+    #     msg: "Would register record {{ record.name }}.{{ record.zone }} at {{ record.ipv4 }} on view {{ record.view }} in network {{ record.network }}"
+    #   loop: "{{ hostvars[groups['nios'][0]]['request_records'] }}"
+    #   loop_control:
+    #     loop_var: record
+    #     index_var: count
     #   tags: [never, setup]
 
     - name: Register host records
       device42_api:
         meth: POST
-        path: api/1.0/hosts
+        path: api/1.0/ips
         data:
-          address: "{{ hostvars[item]['created_ips']['address'] }}"
-      with_items: "{{ groups['nios'] }}"
+          ipaddress: "{{ record.ipv4 }}"
+          subnet: "{{ record.network }}"
+      loop: "{{ hostvars[groups['nios'][0]]['request_records'] }}"
+      loop_control:
+        loop_var: record
+        index_var: count
       tags: [never, setup]
