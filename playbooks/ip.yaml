@@ -84,13 +84,13 @@
       loop_control:
         loop_var: record
         index_var: count
-      tags: [always]
+      tags: [never, prepare]
 
     - name: Set stats
       set_stats:
         data:
           request_records: "{{ request_records }}"
-      tags: [always]
+      tags: [never, prepare]
 
     - name: Create records
       debug:
