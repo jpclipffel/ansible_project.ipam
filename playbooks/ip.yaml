@@ -121,24 +121,24 @@
   hosts: device42
   tasks:
 
-    # - name: Register host records
-    #   debug:
-    #     msg: "Would register record {{ record.name }}.{{ record.zone }} at {{ record.ipv4 }} on view {{ record.view }} in network {{ record.network }}"
-    #   loop: "{{ hostvars[groups['nios'][0]]['request_records'] }}"
-    #   loop_control:
-    #     loop_var: record
-    #     index_var: count
-    #   tags: [never, setup]
-
     - name: Register host records
-      device42_api:
-        meth: POST
-        path: api/1.0/ips
-        data:
-          ipaddress: "{{ record.ipv4 }}"
-          subnet: "{{ record.network }}"
+      debug:
+        msg: "Would register record {{ record.name }}.{{ record.zone }} at {{ record.ipv4 }} on view {{ record.view }} in network {{ record.network }}"
       loop: "{{ hostvars[groups['nios'][0]]['request_records'] }}"
       loop_control:
         loop_var: record
         index_var: count
       tags: [never, setup]
+
+    # - name: Register host records
+    #   device42_api:
+    #     meth: POST
+    #     path: api/1.0/ips
+    #     data:
+    #       ipaddress: "{{ record.ipv4 }}"
+    #       subnet: "{{ record.network }}"
+    #   loop: "{{ hostvars[groups['nios'][0]]['request_records'] }}"
+    #   loop_control:
+    #     loop_var: record
+    #     index_var: count
+    #   tags: [never, setup]
