@@ -71,7 +71,7 @@
       # register: created_network
       tags: [never, setup]
 
-    - name: Set D42 facts
+    - name: Set facts
       set_fact:
         created_network:
           network: "{{ request_network.split('/')[0] }}"
@@ -80,7 +80,7 @@
           plateforme: "{{ request_plateforme }}"
       tags: [never, setup]
 
-    - name: Report
+    - name: Set stats
       set_stats:
         data:
           notify_kind: "{{ 'query' in ansible_run_tags and 'query' or 'setup' }}"
