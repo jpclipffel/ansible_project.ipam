@@ -4,17 +4,23 @@ Ansible project for IPAM automation.
 
 This project includes several Ansible playbooks, custom module and plugin:
 
-| Component                     | Kind           | Description                                      |
-|-------------------------------|----------------|--------------------------------------------------|
-| `playbooks/create-ip.yaml`    | Playbook       | Register one or more IP on Infoblox and Device42 |
-| `playbooks/notify-mail.yaml`  | Playbook       | Notify the caller user by mail                   |
-| `library/device42_api.py`     | Module         | Low-level interface to Device42 REST API         |
-| `plugins/httpapi/device42.py` | HTTPAPI plugin | Connection plugin for Device42 REST API          |
+| Component                     | Kind           | Description                              |
+|-------------------------------|----------------|------------------------------------------|
+| `playbooks/network.yaml`      | Playbook       | Create networks                          |
+| `playbooks/ip.yaml`           | Playbook       | Create IP address(es)                    |
+| `playbooks/notify-mail.yaml`  | Playbook       | Mail notification                        |
+| `library/device42_api.py`     | Module         | Low-level interface to Device42 REST API |
+| `plugins/httpapi/device42.py` | HTTPAPI plugin | Connection plugin for Device42 REST API  |
 
-## Requirements
+## Setup
+
+### Environment
 
 * This project requires the Python package `infoblox-client` [\[1\]][1]
-    * On AWX or Ansible tower, add a new custom virtual environement as follow:
+    * On AWX or Ansible Tower >= 18.X, use an execution environment which
+      includes `infoblox-client` such as `postlux-ict-ipam` 
+    * On AWX or Ansible tower < 18.X, add a new custom virtual environement
+      as follow:
         ```YAML
         custom_venvs:
         - name: ipam
@@ -35,7 +41,16 @@ their connector from host's Python path instead of the Ansible Python path:
 * https://community.infoblox.com/t5/API-Integration/Issues-with-infoblox-client-in-Ansible/td-p/16300
 * https://github.com/ansible/ansible/issues/50881
 
-## Setup
+### Credentials
+
+This project requires the following credentials:
+
+| Component | Kind     | Variable name   | Environment variable name |
+|-----------|----------|-----------------|---------------------------|
+| Infoblox  | Username | `nios_user`     | `INFOBLOX_USERNAME`       |
+| Infoblox  | Password | `nios_password` | `INFOBLOX_PASSWORD`       |
+| Device42  | Username | `d42_user`      |                           |
+| Device42  | Password | `d42_password`  |                           |
 
 ### Inventory
 
