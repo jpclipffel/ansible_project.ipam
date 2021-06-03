@@ -1,0 +1,38 @@
+# code: language=Ansible insertSpaces=true tabSize=2
+
+- name: Check LDAP attributes
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    target_user: "Guillaume Vangrevelinge"
+    target_group: "CN=grp_ict2,OU=Groups,OU=3S,OU=Internal,DC=DT,DC=ept,DC=lu"
+
+  tasks:
+
+    - name: LDAP search
+      community.general.ldap_search:
+        # --- 
+        # dn: "OU=Users,OU=3S,OU=Internal,DC=DT,DC=ept,DC=lu"
+        # ---
+        dn: "CN={{ target_user }},OU=Users,OU=3S,OU=Internal,DC=DT,DC=ept,DC=lu"
+        scope: children
+        attrs:
+          - "memberOf"
+        # ---
+        # dn: "OU=Groups,OU=3S,OU=Internal,DC=DT,DC=ept,DC=lu"
+        # scope: children
+        # ---
+        server_uri: ldap://dtdc.dt.ept.lu
+        validate_certs: no
+        bind_dn: "CN=svc_awx_ldap,OU=Service-Users,OU=3S,OU=Internal,DC=DT,DC=ept,DC=lu"
+        bind_pw: "{{ awx_bind_pw }}"
+        # ---
+      register: user_groups
+
+    - name: Assert user group
+      # debug:
+      #   var: user_groups.results[0].memberOf
+      assert:
+        that:
+          - "'{{ target_group }}' in user_groups.results[0].memberOf"
