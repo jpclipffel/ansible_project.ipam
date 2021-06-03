@@ -1,0 +1,49 @@
+dns_zones:
+- ptech.lu:
+    appliances_sites: [Gare, Kirchberg]
+    appliances_ips: [172.29.245.1]
+- antms.ptech.lu:
+    appliances_sites: [Gare, Kirchberg]
+    appliances_ips: [172.29.245.1]
+- dtt.ptech.lu:
+    appliances_sites: [Gare, Kirchberg]
+    appliances_ips: [172.29.245.1]
+- ict.ptech.lu:
+    appliances_sites: [Gare, Kirchberg]
+    appliances_ips: [172.29.245.1]
+- dci.ict.ptech.lu:
+    appliances_sites: [Gare, Kirchberg]
+    appliances_ips: [172.29.245.1]
+- inb.ict.ptech.lu:
+    appliances_sites: [Gare, Kirchberg]
+    appliances_ips: [172.29.245.1]
+- lab.ict.ptech.lu:
+    appliances_sites: [RCE, RCS]
+    appliances_ips: [172.29.70.70]
+- oob.ict.ptech.lu:
+    appliances_sites: [Gare, Kirchberg]
+    appliances_ips: [172.29.245.1]
+- svc.ict.ptech.lu:
+    appliances_sites: [Gare, Kirchberg]
+    appliances_ips: [172.29.245.1]
+- mob.ptech.lu:
+    appliances_sites: [RCE, RCS]
+    appliances_ips: [172.29.70.70]
+- mano.mob.ptech.lu:
+    appliances_sites: [RCE, RCS]
+    appliances_ips: [172.29.70.70]
+- nfvi.mob.ptech.lu:
+    appliances_sites: [RCE, RCS]
+    appliances_ips: [172.29.70.70]
+- ran.mob.ptech.lu:
+    appliances_sites: [RCE, RCS]
+    appliances_ips: [172.29.70.70]
+- reg.mob.ptech.lu:
+    appliances_sites: [RCE, RCS]
+    appliances_ips: [172.29.70.70]
+- osm.ptech.lu:
+    appliances_sites: [Gare, Kirchberg]
+    appliances_ips: [172.29.245.1]
+- vp.ptech.lu:
+    appliances_sites: [Gare, Kirchberg]
+    appliances_ips: [172.29.245.1]

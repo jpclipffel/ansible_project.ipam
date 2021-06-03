@@ -1,0 +1,23 @@
+{
+    "request_records": [
+        {
+            "ipv4": "172.27.253.129",
+            "name": "test-0",
+            "network": "172.27.253.128/25",
+            "view": "DT-internal",
+            "zone": "dt.ept.lu"
+        },
+        {
+            "ipv4": "172.27.253.130",
+            "name": "test-1",
+            "network": "172.27.253.128/25",
+            "view": "DT-internal",
+            "zone": "dt.ept.lu"
+        }
+    ],
+    "notify_resource": "IP",
+    "notify_action": "creation",
+    "notify_status": "Created",
+    "notify_message": "Creation OK",
+    "tower_user_email": "jean-philippe.clipffel@post.lu"
+}
