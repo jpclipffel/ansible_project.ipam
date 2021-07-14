@@ -47,7 +47,7 @@ class HttpApi(HttpApiBase):
                 params = '&'.join([f'{k}={v}' for k, v in data.items()])
                 path = f'{path}?{params}'
                 data = json.dumps(data)
-            elif method in ['POST',]:
+            elif method in ['POST', 'PUT']:
                 data = '&'.join([f'{k}={v}' for k, v in data.items()])
             # Forge and send request
             response, response_data = self.connection.send(
