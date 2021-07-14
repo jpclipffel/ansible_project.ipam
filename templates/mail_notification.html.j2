@@ -363,6 +363,7 @@
                                     {{ request_container | default('') }}
                                     {{ request_network | default('') }}
                                     {{ request_plateforme | default('') }}
+                                    {{ request_description | default('') }}
                                   </code>
 
                                   {% elif notify_resource | lower in ['ip',] %}
