@@ -17,8 +17,6 @@
           data: "{{ request_container | default('') }}"
         - kind: "network"
           data: "{{ request_network | default('') }}"
-        - kind: "plateforme"
-          data: "{{ request_plateforme | default('') }}"
       tags: [always]
     
     - name: Lookup view, container and network
@@ -59,16 +57,21 @@
         success_msg: "The requested network {{ request_network }} is contained in network container {{ infoblox_container.network }}"
       tags: [always]
 
+    - name: Generate attributes
+      set_fact:
+        request_plateforme: "{{ query('community.general.random_string', length=4, numbers=false, special=false, upper=false)[0] }}-{{ query('community.general.random_string', length=4, numbers=true, special=false, upper=false)[0] }}"
+        request_description: "{{ request_description | default('Generated via Ansible/AWX') }}"
+      tags: [never, setup]
+
     - name: Create network
       nios_network:
         network: "{{ request_network }}"
         network_view: "{{ request_view }}"
         extattrs:
           Plateforme: "{{ request_plateforme }}"
-        comment: "Created by the IPAM automation project"
+        comment: "{{ request_description }}"
         state: present
         provider: "{{ nios_provider }}"
-      # register: created_network
       tags: [never, setup]
 
     - name: Set facts
@@ -78,6 +81,7 @@
           mask_bits: "{{ request_network.split('/')[1] }}"
           network_view: "{{ request_view }}"
           plateforme: "{{ request_plateforme }}"
+          description: "{{ request_description }}"
       tags: [never, setup]
 
     - name: Set stats
@@ -90,18 +94,13 @@
           request_container: "{{ request_container }}"
           request_network: "{{ request_network }}"
           request_plateforme: "{{ request_plateforme }}"
+          request_description: "{{ request_description }}"
       tags: [never, query, setup]
 
 
 - name: Register network
   hosts: device42
   tasks:
-
-    # - name: Register network
-    #   debug:
-    #     var: hostvars[item]['created_network']
-    #   with_items: "{{ groups['nios'] }}"
-    #   tags: [never, setup]
 
     - name: Register network
       device42_api:
@@ -110,5 +109,7 @@
         data:
           network: "{{ hostvars[item]['created_network']['network'] }}"
           mask_bits: "{{ hostvars[item]['created_network']['mask_bits'] }}"
+          name: "{{ hostvars[item]['created_network']['plateforme'] }}"
+          description: "{{ hostvars[item]['created_network']['description'] }}"
       with_items: "{{ groups['nios'] }}"
       tags: [never, setup]
