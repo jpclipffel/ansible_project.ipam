@@ -59,9 +59,9 @@
 
     - name: Generate attributes
       set_fact:
-        request_plateforme: "{{ query('community.general.random_string', length=4, numbers=false, special=false, upper=false)[0] }}-{{ query('community.general.random_string', length=4, numbers=true, special=false, upper=false)[0] }}"
+        request_plateforme: "{{ request_plateforme | default(query('community.general.random_string', length=4, numbers=false, special=false, upper=false)[0] }}-{{ query('community.general.random_string', length=4, numbers=true, special=false, upper=false)[0]) }}"
         request_description: "{{ request_description | default('Generated via Ansible/AWX') }}"
-      tags: [never, setup]
+      tags: [always]
 
     - name: Create network
       nios_network:
@@ -80,8 +80,8 @@
           network: "{{ request_network.split('/')[0] }}"
           mask_bits: "{{ request_network.split('/')[1] }}"
           network_view: "{{ request_view }}"
-          plateforme: "{{ request_plateforme | default('') }}"
-          description: "{{ request_description | default('') }}"
+          plateforme: "{{ request_plateforme }}"
+          description: "{{ request_description }}"
       tags: [never, setup]
 
     - name: Set stats
@@ -93,8 +93,8 @@
           request_view: "{{ request_view }}"
           request_container: "{{ request_container }}"
           request_network: "{{ request_network }}"
-          request_plateforme: "{{ request_plateforme | default('') }}"
-          request_description: "{{ request_description | default('') }}"
+          request_plateforme: "{{ request_plateforme }}"
+          request_description: "{{ request_description }}"
       tags: [never, query, setup]
 
 
