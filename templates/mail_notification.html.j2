@@ -358,20 +358,20 @@
                             <tr>
                               <td>
                                   {% if notify_resource | lower in ['network',] %}
-                                  <code>
-                                    {{ request_view | default('') }}
-                                    {{ request_container | default('') }}
-                                    {{ request_network | default('') }}
-                                    {{ request_plateforme | default('') }}
-                                    {{ request_description | default('') }}
-                                  </code>
+                                  <samp>
+                                    View: {{ request_view | default('') }}<br>
+                                    Container: {{ request_container | default('') }}<br>
+                                    Network: {{ request_network | default('') }}<br>
+                                    Plateforme ID: {{ request_plateforme | default('') }}<br>
+                                    Description: {{ request_description | default('') }}<br>
+                                  </samp>
 
                                   {% elif notify_resource | lower in ['ip',] %}
                                   {% for record in request_records -%}
                                     <samp>
-                                      Name: {{ record.name }}.{{ record.zone }}</br>
-                                      IPv4: {{ record.ipv4 }}</br>
-                                      Network view: {{ record.view }}</br>
+                                      Name: {{ record.name }}.{{ record.zone }}<br>
+                                      IPv4: {{ record.ipv4 }}<br>
+                                      Network view: {{ record.view }}<br>
                                     </samp>
                                     <br>
                                   {% endfor %}
