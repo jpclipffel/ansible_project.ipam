@@ -60,7 +60,7 @@
     - name: Generate attributes
       set_fact:
         request_plateforme: "{{ query('community.general.random_string', length=4, numbers=false, special=false, upper=false)[0] }}-{{ query('community.general.random_string', length=4, numbers=true, special=false, upper=false)[0]) }}"
-      tags: [always, setup]
+      tags: [always]
 
     - name: Create network
       nios_network:
