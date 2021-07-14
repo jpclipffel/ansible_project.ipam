@@ -93,7 +93,6 @@
           request_view: "{{ request_view }}"
           request_container: "{{ request_container }}"
           request_network: "{{ request_network }}"
-          request_plateforme: "{{ request_plateforme }}"
           request_description: "{{ request_description }}"
       tags: [never, query, setup]
 
