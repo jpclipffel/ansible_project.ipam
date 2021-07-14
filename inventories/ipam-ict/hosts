@@ -1,0 +1,27 @@
+# code: language=YAML insertSpaces=true tabSize=2
+
+all:
+  children:
+    # Infoblox nodes
+    nios:
+      hosts:
+        ib_gridmaster:
+          nios_provider:
+            # Required parameters
+            host: ib-gridmaster.dt.ept.lu
+            username: "{{ nios_user | default(lookup('env', 'INFOBLOX_USERNAME')) }}"
+            password: "{{ nios_password | default(lookup('env', 'INFOBLOX_PASSWORD')) }}"
+            # Optional parameters
+            http_request_timeout: 60
+    # Device42 API servers
+    device42:
+      vars:
+          ansible_network_os: device42
+          ansible_connection: httpapi
+          ansible_httpapi_port: 443
+          ansible_httpapi_use_ssl: yes
+          ansible_httpapi_validate_certs: no
+          ansible_user: "{{ d42_user | default(lookup('env', 'DEVICE42_USERNAME')) }}"
+          ansible_password: "{{ d42_password | default(lookup('env', 'DEVICE42_PASSWORD')) }}"
+      hosts:
+        "d42.dt.ept.lu":
