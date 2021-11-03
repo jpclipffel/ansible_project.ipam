@@ -1,1 +1,61 @@
+# code: language=Ansible insertSpaces=true tabSize=2
 
+- hosts: nios
+  connection: local
+  tasks:
+
+    - name: Assert arguments
+      assert:
+        that:
+          - item.data | length > 0
+        fail_msg: "Rejected requested {{ item.kind }}: '{{ item.data }}'"
+        success_msg: "Accepted requested {{ item.kind }}: '{{ item.data }}'"
+      with_items:
+        - kind: "network view"
+          data: "{{ request_view | default('DT-internal') }}"
+        - kind: "network"
+          data: "{{ request_network | default('') }}"
+      tags: [always]
+    
+    - name: Lookup view, container and network
+      set_fact:
+        infoblox_view: "{{ lookup('nios', 'view', provider=nios_provider, filter={'name': request_view}) }}"
+        infoblox_network: "{{ lookup('nios', 'network', provider=nios_provider, filter={'network': request_network}) }}"
+      tags: [always]
+
+    - name: Assert view
+      assert:
+        that:
+          - item.data is mapping and item.data | length > 0
+        fail_msg: "The requested {{ item.kind }} '{{ item.name }}' was not found in Infoblox"
+        success_msg: "The requested {{ item.kind }} '{{ item.name }}' is valid"
+      with_items:
+        - kind: "network view"
+          name: "{{ request_view }}"
+          data: "{{ infoblox_view }}"
+      tags: [always]
+
+    - name: Assert network does not already exists
+      assert:
+        that:
+          - infoblox_network | length == 0
+        success_msg: "The request network does not exists, continue"
+        fail_msg: "The request network {{ request_network }} already exists"
+      tags: [always]
+
+    - name: Generate attributes
+      set_fact:
+        request_comment: "{{ request_comment | default('') }}"
+        request_description: "{{ request_description | default('Added by BOPI') }}"
+      tags: [always]
+
+    - name: Create network
+      nios_network:
+        network: "{{ request_network }}"
+        network_view: "{{ request_view }}"
+        extattrs:
+          Description: "{{ request_description }}"
+        comment: "{{ request_comment }}"
+        state: present
+        provider: "{{ nios_provider }}"
+      tags: [never, setup]
