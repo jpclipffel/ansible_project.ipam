@@ -2,6 +2,8 @@
 
 - hosts: nios
   connection: local
+  # collections:
+  #   - infoblox.nios_modules
   tasks:
 
     - name: Assert arguments
@@ -29,8 +31,8 @@
     
     - name: Lookup view, container and network
       set_fact:
-        infoblox_view: "{{ lookup('infoblox.nios_modules.nios', 'view', provider=nios_provider, filter={'name': request_view}) }}"
-        infoblox_network: "{{ lookup('infoblox.nios_modules.nios', 'network', provider=nios_provider, filter={'network': request_network}) }}"
+        infoblox_view: "{{ lookup('nios', 'view', provider=nios_provider, filter={'name': request_view}) }}"
+        infoblox_network: "{{ lookup('nios', 'network', provider=nios_provider, filter={'network': request_network}) }}"
       tags: [always]
 
     - name: Assert view
