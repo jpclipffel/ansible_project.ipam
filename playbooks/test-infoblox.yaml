@@ -57,6 +57,7 @@
         register: _create_host_record
         failed_when:
           - _create_host_record.failed and not "already exists" in _create_host_record.msg
+        delegate_to: localhost
   
       - name: Create a network
         nios_network:
