@@ -46,7 +46,7 @@
     - block:
 
       - name: Create a host record
-        nios_host_record:
+        infoblox.nios_modules.nios_host_record:
           name: created-by-ansible.dt.ept.lu
           view: DT-internal
           ipv4addrs:
@@ -59,7 +59,7 @@
           - _create_host_record.failed and not "already exists" in _create_host_record.msg
   
       - name: Create a network
-        nios_network:
+        infoblox.nios_modules.nios_network:
           network: 172.27.253.128/25
           network_view: DT-internal
           extattrs:
@@ -82,14 +82,14 @@
     - block:
 
       - name: Delete a host record
-        nios_host_record:
+        infoblox.nios_modules.nios_host_record:
           name: created-by-ansible.dt.ept.lu
           view: "DT-internal"
           state: absent
           provider: "{{ nios_provider }}"
       
       - name: Delete a network
-        nios_network:
+        infoblox.nios_modules.nios_network:
           network: 172.27.253.128/25
           network_view: DT-internal
           state: absent
