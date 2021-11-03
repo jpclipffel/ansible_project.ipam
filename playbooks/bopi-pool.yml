@@ -56,7 +56,7 @@
       tags: [always]
 
     - name: Create network
-      community.general.nios.nios_network:
+      nios_network:
         network: "{{ request_network }}"
         network_view: "{{ request_view }}"
         extattrs:
