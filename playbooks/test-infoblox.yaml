@@ -60,7 +60,7 @@
         delegate_to: localhost
   
       - name: Create a network
-        nios_network:
+        infoblox.nios_modules.nios_network:
           network: 172.27.253.128/25
           network_view: DT-internal
           extattrs:
@@ -69,6 +69,7 @@
           state: present
           provider: "{{ nios_provider }}"
         register: _create_network
+        delegate_to: localhost
 
       tags: [never, setup]
 
@@ -88,6 +89,7 @@
           view: "DT-internal"
           state: absent
           provider: "{{ nios_provider }}"
+        delegate_to: localhost
       
       - name: Delete a network
         infoblox.nios_modules.nios_network:
@@ -95,5 +97,6 @@
           network_view: DT-internal
           state: absent
           provider: "{{ nios_provider }}"
+        delegate_to: localhost
       
       tags: [never, teardown, remove]
