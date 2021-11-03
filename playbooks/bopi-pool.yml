@@ -28,11 +28,17 @@
       with_items:
         - kind: "network view"
           data: "{{ request_view | default('BOPI-test') }}"
+      tags: [always]
     
+    - name: Debug
+      debug:
+        var: nios_provider
+      tags: [always]
+
     - name: Lookup view, container and network
       set_fact:
-        infoblox_view: "{{ lookup('community.general.nios', 'view', provider=nios_provider, filter={'name': request_view}) }}"
-        infoblox_network: "{{ lookup('community.general.nios', 'network', provider=nios_provider, filter={'network': request_network}) }}"
+        infoblox_view: "{{ lookup('community.general.nios', 'view', filter={'name': request_view}, provider=nios_provider) }}"
+        infoblox_network: "{{ lookup('community.general.nios', 'network', filter={'network': request_network}, provider=nios_provider) }}"
       tags: [always]
 
     - name: Assert view
