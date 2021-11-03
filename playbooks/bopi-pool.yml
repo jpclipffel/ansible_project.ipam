@@ -12,10 +12,20 @@
         success_msg: "Accepted requested {{ item.kind }}: '{{ item.data }}'"
       with_items:
         - kind: "network view"
-          data: "{{ request_view | default('DT-internal') }}"
+          data: "{{ request_view | default('BOPI-test') }}"
         - kind: "network"
           data: "{{ request_network | default('') }}"
       tags: [always]
+
+    - name: Assert network view
+      assert:
+        that:
+          - item.data == "BOPI-test"
+        fail_msg: "Not allowed to use this netrwork view."
+        success_msg: "Network view BOPI-test"
+      with_items:
+        - kind: "network view"
+          data: "{{ request_view | default('BOPI-test') }}"
     
     - name: Lookup view, container and network
       set_fact:
