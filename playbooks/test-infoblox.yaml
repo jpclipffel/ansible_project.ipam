@@ -46,7 +46,7 @@
     - block:
 
       - name: Create a host record
-        nios_host_record:
+        infoblox.nios_modules.nios_host_record:
           name: created-by-ansible.dt.ept.lu
           view: DT-internal
           ipv4addrs:
