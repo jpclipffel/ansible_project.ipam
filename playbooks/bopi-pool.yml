@@ -41,18 +41,6 @@
         infoblox_network: "{{ lookup('community.general.nios', 'network', filter={'network': request_network}, provider=nios_provider) }}"
       tags: [always]
 
-    - name: Assert view
-      assert:
-        that:
-          - item.data is mapping and item.data | length > 0
-        fail_msg: "The requested {{ item.kind }} '{{ item.name }}' was not found in Infoblox"
-        success_msg: "The requested {{ item.kind }} '{{ item.name }}' is valid"
-      with_items:
-        - kind: "network view"
-          name: "{{ request_view }}"
-          data: "{{ infoblox_view }}"
-      tags: [always]
-
     - name: Assert network does not already exists
       assert:
         that:
