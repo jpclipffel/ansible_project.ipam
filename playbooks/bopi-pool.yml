@@ -64,4 +64,5 @@
         comment: "{{ request_comment }}"
         state: present
         provider: "{{ nios_provider }}"
+      delegate_to: localhost
       tags: [never, setup]
