@@ -126,12 +126,14 @@
     - name: Generate Non FQDN name
       set_fact:
         object_name: "{{ request_host }}"
+        add_to_dns: no
       when: request_zone | length == 0
       tags: [always]
 
     - name: Generate FQDN name
       set_fact:
         object_name: "{{ request_host }}.{{ request_zone }}"
+        add_to_dns: yes
       when: request_zone | length > 0
       tags: [always]
 
@@ -143,7 +145,7 @@
     - name: Create host IPv4 and IPv6
       community.general.nios_host_record:
         name: "{{ object_name }}"
-        configure_for_dns: no
+        configure_for_dns: add_to_dns
         view: "{{ request_view }}"
         ipv4addrs:
           - ipv4addr: "{{ request_ipv4 }}"
@@ -162,7 +164,7 @@
     - name: Create host IPv4 only
       community.general.nios_host_record:
         name: "{{ object_name }}"
-        configure_for_dns: no
+        configure_for_dns: add_to_dns
         view: "{{ request_view }}"
         ipv4addrs:
           - ipv4addr: "{{ request_ipv4 }}"
