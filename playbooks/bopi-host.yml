@@ -94,8 +94,19 @@
       assert:
         that:
           - infoblox_host | length == 0
-        success_msg: "The request network does not exists, continue"
+        success_msg: "The request host does not exists, continue"
         fail_msg: "The request host {{ request_host }} already exists"
+      tags: [always]
+
+    - name: Return the list of host with specific IP
+      debug:
+        msg: "{{ lookup('community.general.nios', 'record:host', filter={'ipv4addr': request_ipv4}, provider=nios_provider) }}"
+        msg: "{{ lookup('community.general.nios', 'record:host', filter={'networkview': request_view, ''ipv4addr': request_ipv4'}, provider=nios_provider) }}"
+      tags: [always]
+
+    - name: Return the list of host with specific IP and view
+      debug:
+        msg: "{{ lookup('community.general.nios', 'record:host', filter={'networkview': request_view, ''ipv4addr': request_ipv4'}, provider=nios_provider) }}"
       tags: [always]
 
     - name: Generate Non FQDN name
