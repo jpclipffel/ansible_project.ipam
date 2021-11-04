@@ -142,7 +142,7 @@
 
     - name: Create host IPv4 and IPv6
       community.general.nios_host_record:
-        name: "{{ request_host }}.{{ request_zone }}"
+        name: "{{ object_name }}"
         view: "{{ request_view }}"
         ipv4addrs:
           - ipv4addr: "{{ request_ipv4 }}"
@@ -160,7 +160,7 @@
 
     - name: Create host IPv4 only
       community.general.nios_host_record:
-        name: "{{ request_host }}.{{ request_zone }}"
+        name: "{{ object_name }}"
         view: "{{ request_view }}"
         ipv4addrs:
           - ipv4addr: "{{ request_ipv4 }}"
