@@ -79,6 +79,11 @@
         var: infoblox_view
       tags: [never, debug]
 
+    - name: Debug host ipv4
+      debug:
+        var: infoblox_host_ipv4
+      tags: [never, debug]
+
     - name: Assert view exists on infoblox
       assert:
         that:
