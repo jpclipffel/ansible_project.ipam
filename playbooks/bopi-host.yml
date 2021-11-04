@@ -20,8 +20,8 @@
           data: "{{ request_host | default('') }}"
           test:
             - "item.data | length > 0"
-        - name: "DNS zone"
-          data: "{{ request_zone | default('') }}"
+        - name: "IP address"
+          data: "{{ request_ip | default('') }}"
           test:
             - "item.data | length > 0"
       tags: [always]
@@ -37,15 +37,29 @@
           data: "{{ request_view | default('BOPI-test') }}"
       tags: [always]
 
-    - name : Assert DNS zone
-      assert:
-        that:
-          - item.data == "lab2.ict.ptech.lu"
-        fail_msg: "Not allowed to use this DNS zone."
-        success_msg: "DNS zone lab2.ict.ptech.lu"
-      with_items:
-        - kind: "dns zone"
-          data: "{{ request_zone | default('') }}"
+    - name: Assert DNS zone
+      tasks:
+        - name: Non empty DNZ zone
+          assert:
+            that:
+              - item.data == "lab2.ict.ptech.lu"
+            fail_msg: "Not allowed to use this DNS zone."
+            success_msg: "DNS zone lab2.ict.ptech.lu"
+          with_items:
+            - kind: "dns zone"
+              data: "{{ request_zone | default('') }}"
+          when: request_zone | length > 0
+
+        - name: Empty DNS zone
+          assert:
+            that:
+              - item.data == ''
+            fail_msg: "Not allowed to use this DNS zone."
+            success_msg: "No DNS entry to create."
+          with_items:
+            - kind: "dns zone"
+              data: "{{ request_zone | default('') }}"
+          when: request_zone | length == 0
       tags: [always]
 
     - name: Lookup view, and host
@@ -74,12 +88,30 @@
         fail_msg: "The request host {{ request_host }} already exists"
       tags: [always]
 
+    - name: Generate object name
+      tasks:
+        - name: Non FQDN name
+          set_fact:
+            object_name: "{{ request_host }}"
+          when: request_zone | length == 0
+
+        - name: FQDN name
+          set_fact:
+            object_name: "{{ request_host }}.{{ request_zone }}"
+          when: request_zone | length > 0
+      tags: [always]
+
+    - name: Debug
+      debug:
+        var: object_name
+      tags: [always]
+
     - name: Create host
       community.general.nios_host_record:
-        name: "{{ record.name }}.{{ record.zone }}"
-        view: "{{ record.view }}"
+        name: "{{ request_host }}.{{ request_zone }}"
+        view: "{{ request_view }}"
         ipv4addrs:
-          - ipv4addr: "{{ record.ipv4 }}"
+          - ipv4addr: "{{ request_ip }}"
         extattrs:
             Contacts: "{{ request_requestor }}"
             Description: "{{ request_description }}"
