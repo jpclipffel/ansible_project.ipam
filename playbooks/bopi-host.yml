@@ -16,8 +16,8 @@
           data: "{{ request_view | default('BOPI-test') }}"
           test:
             - "item.data | length > 0"
-        - name: "network"
-          data: "{{ request_network | default('') }}"
+        - name: "host"
+          data: "{{ request_host | default('') }}"
           test:
             - "item.data | length > 0"
         - name: "DNS zone"
@@ -26,7 +26,7 @@
             - "item.data | length > 0"
       tags: [always]
 
-    - name: Assert network view
+    - name: Assert view
       assert:
         that:
           - item.data == "BOPI-test"
@@ -48,24 +48,30 @@
           data: "{{ request_zone | default('') }}"
       tags: [always]
 
-    - name: Lookup view, container and network
+    - name: Lookup view, and host
       set_fact:
         infoblox_view: "{{ lookup('community.general.nios', 'view', filter={'name': request_view}, provider=nios_provider) }}"
-        infoblox_network: "{{ lookup('community.general.nios', 'network', filter={'network': request_network}, provider=nios_provider) }}"
+        infoblox_host: "{{ lookup('community.general.nios', 'record:host', filter={'name': request_host}, provider=nios_provider) }}"
       tags: [always]
 
-    - name: Assert network does not already exists
+    - name: Assert view exists on infoblox
       assert:
         that:
-          - infoblox_network | length == 0
-        success_msg: "The request network does not exists, continue"
-        fail_msg: "The request network {{ request_network }} already exists"
+          - "item.data is mapping and item.data | length > 0"
+        fail_msg: "The requested {{ item.kind }} '{{ item.name }}' was not found in Infoblox"
+        success_msg: "The requested {{ item.kind }} '{{ item.name }}' is valid"
+      with_items:
+        - kind: 'network view'
+          name: "{{ request_view }}"
+          data: "{{ infoblox_view }}"
       tags: [always]
 
-    - name: Generate attributes
-      set_fact:
-        request_comment: "{{ request_comment | default('') }}"
-        request_description: "{{ request_description | default('Added by BOPI') }}"
+    - name: Assert host does not already exists
+      assert:
+        that:
+          - infoblox_host | length == 0
+        success_msg: "The request network does not exists, continue"
+        fail_msg: "The request host {{ request_host }} already exists"
       tags: [always]
 
     - name: Create host
@@ -82,15 +88,3 @@
         provider: "{{ nios_provider }}"
       delegate_to: localhost
       tags: [never, setup]
-
-      - hosts: nios
-  connection: local
-  tasks:
-    - name: configure an IPv4 host record
-      nios_host_record:
-        name: leaf03.ansible.com
-        ipv4addrs:
-          - ipv4addr:
-              "{{ lookup('nios_next_ip', '192.168.100.0/24', provider=nios_provider)[0] }}"
-        state: present
-provider: "{{nios_provider}}"
