@@ -134,7 +134,7 @@
         var: object_name
       tags: [never, debug]
 
-    - name: Create host
+    - name: Create host IPv4 and IPv6
       community.general.nios_host_record:
         name: "{{ request_host }}.{{ request_zone }}"
         view: "{{ request_view }}"
@@ -148,5 +148,22 @@
         comment: "{{request_comment}}}}"
         state: present
         provider: "{{ nios_provider }}"
+      when: request_ipv6 | length > 0
+      delegate_to: localhost
+      tags: [never, setup]
+
+    - name: Create host IPv4 only
+      community.general.nios_host_record:
+        name: "{{ request_host }}.{{ request_zone }}"
+        view: "{{ request_view }}"
+        ipv4addrs:
+          - ipv4addr: "{{ request_ipv4 }}"
+        extattrs:
+            Contacts: "{{ request_requestor }}"
+            Description: "{{ request_description }}"
+        comment: "{{request_comment}}}}"
+        state: present
+        provider: "{{ nios_provider }}"
+      when: request_ipv6 | length <= 0
       delegate_to: localhost
       tags: [never, setup]
