@@ -37,29 +37,29 @@
           data: "{{ request_view | default('BOPI-test') }}"
       tags: [always]
 
-    - name: Assert DNS zone
-      tasks:
-        - name: Non empty DNZ zone
-          assert:
-            that:
-              - item.data == "lab2.ict.ptech.lu"
-            fail_msg: "Not allowed to use this DNS zone."
-            success_msg: "DNS zone lab2.ict.ptech.lu"
-          with_items:
-            - kind: "dns zone"
-              data: "{{ request_zone | default('') }}"
-          when: request_zone | length > 0
+    
+    - name: Assert Non empty DNZ zone
+      assert:
+        that:
+          - item.data == "lab2.ict.ptech.lu"
+        fail_msg: "Not allowed to use this DNS zone."
+        success_msg: "DNS zone lab2.ict.ptech.lu"
+      with_items:
+        - kind: "dns zone"
+          data: "{{ request_zone | default('') }}"
+      when: request_zone | length > 0
+      tags: [always]
 
-        - name: Empty DNS zone
-          assert:
-            that:
-              - item.data == ''
-            fail_msg: "Not allowed to use this DNS zone."
-            success_msg: "No DNS entry to create."
-          with_items:
-            - kind: "dns zone"
-              data: "{{ request_zone | default('') }}"
-          when: request_zone | length <= 0
+    - name: Asset Empty DNS zone
+      assert:
+        that:
+          - item.data == ''
+        fail_msg: "Not allowed to use this DNS zone."
+        success_msg: "No DNS entry to create."
+      with_items:
+        - kind: "dns zone"
+          data: "{{ request_zone | default('') }}"
+      when: request_zone | length <= 0
       tags: [always]
 
     - name: Lookup view, and host
