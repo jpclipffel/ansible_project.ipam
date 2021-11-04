@@ -59,7 +59,7 @@
           with_items:
             - kind: "dns zone"
               data: "{{ request_zone | default('') }}"
-          when: request_zone | length == 0
+          when: request_zone | length <= 0
       tags: [always]
 
     - name: Lookup view, and host
