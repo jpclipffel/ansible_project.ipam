@@ -17,6 +17,8 @@
           data: "{{ request_view | default('BOPI-test') }}"
         - kind: "network"
           data: "{{ request_network | default('') }}"
+        - kind: "requestor"
+          data: "{{ request_requestor | default('') }}"
       tags: [always]
 
     - name: Assert network view
@@ -60,6 +62,7 @@
         network: "{{ request_network }}"
         network_view: "{{ request_view }}"
         extattrs:
+          Contacts: "{{ request_requestor }}"
           Description: "{{ request_description }}"
         comment: "{{ request_comment }}"
         state: present
