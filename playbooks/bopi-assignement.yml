@@ -67,7 +67,6 @@
           Description: "{{ request_description }}"
         comment: "{{ request_comment }}"
         state: present
-        container: no
         provider: "{{ nios_provider }}"
       delegate_to: localhost
       tags: [never, setup]
