@@ -8,17 +8,22 @@
 
     - name: Assert arguments
       assert:
-        that:
-          - item.data | length > 0
-        fail_msg: "Rejected requested {{ item.kind }}: '{{ item.data }}'"
-        success_msg: "Accepted requested {{ item.kind }}: '{{ item.data }}'"
+        that: "{{ item.test }}"
+        fail_msg: "Rejected requested {{ item.name }}: '{{ item.data }}'"
+        success_msg: "Accepted requested {{ item.name }}: '{{ item.data }}'"
       with_items:
-        - kind: "network view"
+        - name: "network view"
           data: "{{ request_view | default('BOPI-test') }}"
-        - kind: "network"
+          test:
+            - "item.data | length > 0"
+        - name: "network"
           data: "{{ request_network | default('') }}"
-        - kind: "requestor"
-          data: "{{ request_requestor | default('') }}"
+          test:
+            - "item.data | length > 0"
+        - name: "DNS zone"
+          data: "{{ request_zone | default('') }}"
+          test:
+            - "item.data | length > 0"
       tags: [always]
 
     - name: Assert network view
@@ -31,11 +36,17 @@
         - kind: "network view"
           data: "{{ request_view | default('BOPI-test') }}"
       tags: [always]
-    
-    #- name: Debug
-      #debug:
-        #var: nios_provider
-      #tags: [always]
+
+    - name : Assert DNS zone
+      assert:
+        that:
+          - item.data == "lab2.ict.ptech.lu"
+        fail_msg: "Not allowed to use this DNS zone."
+        success_msg: "DNS zone lab2.ict.ptech.lu"
+      with_items:
+        - kind: "dns zone"
+          data: "{{ request_zone | default('') }}"
+      tags: [always]
 
     - name: Lookup view, container and network
       set_fact:
@@ -57,16 +68,29 @@
         request_description: "{{ request_description | default('Added by BOPI') }}"
       tags: [always]
 
-    - name: Create network
-      infoblox.nios_modules.nios_network:
-        network: "{{ request_network }}"
-        network_view: "{{ request_view }}"
+    - name: Create host
+      community.general.nios_host_record:
+        name: "{{ record.name }}.{{ record.zone }}"
+        view: "{{ record.view }}"
+        ipv4addrs:
+          - ipv4addr: "{{ record.ipv4 }}"
         extattrs:
-          Contacts: "{{ request_requestor }}"
-          Description: "{{ request_description }}"
-        comment: "{{ request_comment }}"
+            Contacts: "{{ request_requestor }}"
+            Description: "{{ request_description }}"
+        comment: "{{request_comment}}}}"
         state: present
-        container: yes
         provider: "{{ nios_provider }}"
       delegate_to: localhost
       tags: [never, setup]
+
+      - hosts: nios
+  connection: local
+  tasks:
+    - name: configure an IPv4 host record
+      nios_host_record:
+        name: leaf03.ansible.com
+        ipv4addrs:
+          - ipv4addr:
+              "{{ lookup('nios_next_ip', '192.168.100.0/24', provider=nios_provider)[0] }}"
+        state: present
+provider: "{{nios_provider}}"
