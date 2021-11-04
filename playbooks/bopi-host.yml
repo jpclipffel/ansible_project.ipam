@@ -88,17 +88,16 @@
         fail_msg: "The request host {{ request_host }} already exists"
       tags: [always]
 
-    - name: Generate object name
-      tasks:
-        - name: Non FQDN name
-          set_fact:
-            object_name: "{{ request_host }}"
-          when: request_zone | length == 0
+    - name: Generate Non FQDN name
+      set_fact:
+        object_name: "{{ request_host }}"
+      when: request_zone | length == 0
+      tags: [always]
 
-        - name: FQDN name
-          set_fact:
-            object_name: "{{ request_host }}.{{ request_zone }}"
-          when: request_zone | length > 0
+    - name: Generate FQDN name
+      set_fact:
+        object_name: "{{ request_host }}.{{ request_zone }}"
+      when: request_zone | length > 0
       tags: [always]
 
     - name: Debug
