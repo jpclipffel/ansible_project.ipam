@@ -152,7 +152,7 @@
         extattrs:
             Contacts: "{{ request_requestor }}"
             Description: "{{ request_description }}"
-        comment: "{{request_comment}}}}"
+        comment: "{{request_comment}}"
         state: present
         provider: "{{ nios_provider }}"
       when: request_ipv6 | length > 0
@@ -169,7 +169,7 @@
         extattrs:
             Contacts: "{{ request_requestor }}"
             Description: "{{ request_description }}"
-        comment: "{{request_comment}}}}"
+        comment: "{{request_comment}}"
         state: present
         provider: "{{ nios_provider }}"
       when: request_ipv6 | length <= 0
