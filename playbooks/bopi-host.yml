@@ -62,6 +62,11 @@
       when: request_zone | length <= 0
       tags: [always]
 
+    - name: Return the list of network views
+      debug:
+        msg: "{{ lookup('community.general.nios', 'networkview', provider=nios_provider) }}"
+      tags: [always]
+
     - name: Lookup view, and host
       set_fact:
         infoblox_view: "{{ lookup('community.general.nios', 'view', filter={'name': request_view}, provider=nios_provider) }}"
