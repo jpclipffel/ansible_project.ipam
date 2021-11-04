@@ -105,7 +105,7 @@
 
     - name: Return the list of host with specific IP and view
       debug:
-        msg: "{{ lookup('community.general.nios', 'record:host', filter={'networkview': request_view, ''ipv4addr': request_ipv4'}, provider=nios_provider) }}"
+        msg: "{{ lookup('community.general.nios', 'record:host', filter={'networkview': request_view, 'ipv4addr': request_ipv4}, provider=nios_provider) }}"
       tags: [always]
 
     - name: Generate Non FQDN name
