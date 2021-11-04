@@ -71,12 +71,13 @@
       set_fact:
         infoblox_view: "{{ lookup('community.general.nios', 'networkview', filter={'name': request_view}, provider=nios_provider) }}"
         infoblox_host: "{{ lookup('community.general.nios', 'record:host', filter={'name': request_host}, provider=nios_provider) }}"
+        infoblox_host_ipv4: "{{ lookup('community.general.nios', 'record:host', filter={'ipv4addr': request_ipv4}, provider=nios_provider) }}"
       tags: [always]
 
     - name: Debug view
       debug:
         var: infoblox_view
-      tags: [always]
+      tags: [never, debug]
 
     - name: Assert view exists on infoblox
       assert:
@@ -103,9 +104,12 @@
         msg: "{{ lookup('community.general.nios', 'record:host', filter={'ipv4addr': request_ipv4}, provider=nios_provider) }}"
       tags: [always]
 
-    - name: Return the list of host with specific IP and view
-      debug:
-        msg: "{{ lookup('community.general.nios', 'record:host', filter={'networkview': request_view, 'ipv4addr': request_ipv4}, provider=nios_provider) }}"
+    - name: Assert IPv4 does not already exists
+      assert:
+        that:
+          - infoblox_host_ipv4 | length == 0
+        success_msg: "The request IPv4 does not exists, continue"
+        fail_msg: "The request IPv4 {{ request_ipv4 }} already exists"
       tags: [always]
 
     - name: Generate Non FQDN name
@@ -123,7 +127,7 @@
     - name: Debug
       debug:
         var: object_name
-      tags: [always]
+      tags: [never, debug]
 
     - name: Create host
       community.general.nios_host_record:
