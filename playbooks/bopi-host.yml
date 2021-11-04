@@ -69,7 +69,7 @@
 
     - name: Lookup view, and host
       set_fact:
-        infoblox_view: "{{ lookup('community.general.nios', 'view', filter={'name': request_view}, provider=nios_provider) }}"
+        infoblox_view: "{{ lookup('community.general.nios', 'networkview', filter={'name': request_view}, provider=nios_provider) }}"
         infoblox_host: "{{ lookup('community.general.nios', 'record:host', filter={'name': request_host}, provider=nios_provider) }}"
       tags: [always]
 
